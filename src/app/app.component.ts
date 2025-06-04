@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { environments } from '../environments/environments';
 
 @Component({
   selector: 'app-root',
@@ -9,5 +10,10 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'Magnise_Fintacharts';
+  title = 'Fintacharts_Market_Task';
+
+  constructor(){
+    console.log(environments.API_KEY);
+    
+  }
 }
