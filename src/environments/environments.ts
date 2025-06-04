@@ -1,4 +1,5 @@
 export const environments = {
   production: false,
-  API_KEY: process.env['API_KEY'] 
+  USERNAME: process.env['USERNAME'],
+  PASSWORD: process.env['PASSWORD'],
 }

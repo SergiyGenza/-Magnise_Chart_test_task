@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { environments } from '../environments/environments';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -9,11 +9,14 @@ import { environments } from '../environments/environments';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'Fintacharts_Market_Task';
 
-  constructor(){
-    console.log(environments.API_KEY);
-    
+  authService = inject(AuthService);
+
+  constructor() {}
+
+  ngOnInit(): void {
+    // this.authService.fetchToken()
   }
 }
