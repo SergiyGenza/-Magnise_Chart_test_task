@@ -1,16 +1,18 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
 import { catchError, Observable, throwError } from 'rxjs';
+import { environments } from '../../environments/environments';
 
 @Injectable({
   providedIn: 'root'
 })
 export class InstrumentsService {
-  private instrumentsUrl = 'http://localhost:3000/api/instruments';
-  private barsUrl = 'http://localhost:3000/api/bars';
+  private http = inject(HttpClient);
+  private authService = inject(AuthService);
 
-  constructor(private http: HttpClient, private authService: AuthService) { }
+  private instrumentsUrl = environments.API_INSTRUMENTS!;
+  private barsUrl = environments.API_BARS!;
 
   public getInstruments(provider: string = 'oanda', kind: string = 'forex', symbol?: string, page?: number, size?: number): Observable<any> {
     let params = new HttpParams();

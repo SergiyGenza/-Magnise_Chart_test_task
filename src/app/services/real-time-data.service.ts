@@ -1,20 +1,21 @@
-import { Injectable } from '@angular/core';
-import { catchError, delay, Observable, retryWhen, Subject, switchMap, tap, throwError } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
+import { catchError, Observable, Subject, throwError } from 'rxjs';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import { AuthService } from './auth.service';
+import { environments } from '../../environments/environments';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RealTimeDataService {
 
+  private authService = inject(AuthService);
   private socketSubject!: WebSocketSubject<any>;
   private messagesSubject = new Subject<any>();
   public messages$: Observable<any> = this.messagesSubject.asObservable();
 
-  private readonly WS_URL = 'ws://localhost:3000/ws';
+  private readonly WS_URL = environments.WS_URL!;
 
-  constructor(private authService: AuthService) { }
 
   public connect(): Observable<any> {
     const token = this.authService.getAuthToken();

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, throwError } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
@@ -8,13 +8,15 @@ import { environments } from '../../environments/environments';
   providedIn: 'root'
 })
 export class AuthService {
-  private tokenUrl = 'http://localhost:3000/api/token';
-  private TOKEN_KEY = 'authToken';
+  private readonly tokenUrl = environments.API_KEY!;
+  private readonly TOKEN_KEY = 'authToken';
 
   private _isAuthenticated = new BehaviorSubject<boolean>(false);
   public isAuthenticated$ = this._isAuthenticated.asObservable();
 
-  constructor(private http: HttpClient) {
+  private http = inject(HttpClient);
+
+  constructor() {
     this.checkTokenOnAppInit();
   }
 
@@ -54,12 +56,12 @@ export class AuthService {
     );
   }
 
-  private saveAuthToken(token: string): void {
-    localStorage.setItem(this.TOKEN_KEY, token);
+  public getAuthToken(): string | null {
+    return localStorage.getItem(this.TOKEN_KEY);
   }
 
-  getAuthToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
+  private saveAuthToken(token: string): void {
+    localStorage.setItem(this.TOKEN_KEY, token);
   }
 
   private handleError(error: HttpErrorResponse) {
