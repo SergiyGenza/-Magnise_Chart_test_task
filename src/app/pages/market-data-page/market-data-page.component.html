@@ -1,1 +1,13 @@
-<p>market-data-page works!</p>
+<!-- <button (click)="getInsrument()">getInsrument</button> -->
+<button (click)="getItemBar()">getItemBar</button>
+<button (click)="websocket()">websocket</button>
+<button (click)="sendMessage()">sendMessage</button>
+
+@if (instrumentsList$ | async; as instrumentList){
+<instrument-picker 
+  [instrumentList]="instrumentList"
+  (instumentSelectedId)="onInstumentSelect($event)">
+</instrument-picker>
+}
+
+

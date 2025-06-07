@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { catchError, Observable, Subject, throwError } from 'rxjs';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import { AuthService } from './auth.service';
-import { environments } from '../../environments/environments';
+import { environments } from '../../../environments/environments';
 
 @Injectable({
   providedIn: 'root'

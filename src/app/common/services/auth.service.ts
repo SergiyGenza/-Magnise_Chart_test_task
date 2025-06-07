@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, throwError } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
-import { environments } from '../../environments/environments';
+import { environments } from '../../../environments/environments';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +11,7 @@ export class AuthService {
   private readonly tokenUrl = environments.API_KEY!;
   private readonly TOKEN_KEY = 'authToken';
 
-  private _isAuthenticated = new BehaviorSubject<boolean>(false);
+  public readonly _isAuthenticated = new BehaviorSubject<boolean>(false);
   public isAuthenticated$ = this._isAuthenticated.asObservable();
 
   private http = inject(HttpClient);
