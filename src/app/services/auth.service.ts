@@ -31,13 +31,11 @@ export class AuthService {
 
   public fetchToken() {
     const payload = {
-      grant_type: 'password',
       username: environments.USERNAME,
       password: environments.PASSWORD,
-      client_id: 'app-cli',
     };
 
-    this.http.post<any>(this.tokenUrl, payload).pipe(
+    return this.http.post<any>(this.tokenUrl, payload).pipe(
       tap((response: any) => {
         if (response && response.access_token) {
           this.saveAuthToken(response.access_token);
