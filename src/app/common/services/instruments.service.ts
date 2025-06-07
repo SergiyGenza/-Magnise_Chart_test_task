@@ -46,7 +46,7 @@ export class InstrumentsService {
     );
   }
 
-  public getItemBar(instrumentId: string, provider: string = 'oanda', interval: number = 1, periodicity: string = 'minute', barsCount: number = 10): Observable<any> {
+  public getItemBarData(instrumentId: string, provider: string = 'oanda', interval: number = 1, periodicity: string = 'minute', barsCount: number = 10): Observable<any> {
     let params = new HttpParams();
     params = params.append('instrumentId', instrumentId);
     params = params.append('provider', provider);
@@ -55,8 +55,6 @@ export class InstrumentsService {
     params = params.append('barsCount', barsCount.toString());
 
     const authToken = this.authService.getAuthToken();
-
-    console.log('authToken', authToken);
 
     if (!authToken) {
       return throwError(() => new Error('Authentication token not found. Please log in.'));

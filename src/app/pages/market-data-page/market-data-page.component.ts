@@ -1,90 +1,66 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { AuthService } from '../../common/services/auth.service';
 import { InstrumentsService } from '../../common/services/instruments.service';
 import { RealTimeDataService } from '../../common/services/real-time-data.service';
 import { InstrumentPickerComponent } from '../../shared/components/instrument-picker/instrument-picker.component';
 import { map, Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { Instrument, InstrumentReponce } from '../../common/models/instrument';
+import { LiveDataComponent } from '../../shared/components/live-data/live-data.component';
+import { HistoricalChartComponent } from '../../shared/components/historical-chart/historical-chart.component';
+import { CandlestickChart } from '../../common/models/candlestick.chart';
+import { LiveData, LiveDataRes } from '../../common/models/live.data';
 
 @Component({
   selector: 'market-data-page',
   standalone: true,
-  imports: [InstrumentPickerComponent, AsyncPipe],
+  imports: [InstrumentPickerComponent, LiveDataComponent, HistoricalChartComponent, AsyncPipe],
   templateUrl: './market-data-page.component.html',
   styleUrl: './market-data-page.component.scss'
 })
 export class MarketDataPageComponent implements OnInit {
-
-  private authService = inject(AuthService);
-  private instruments = inject(InstrumentsService);
+  private instrumentsService = inject(InstrumentsService);
   private realtimeDataService = inject(RealTimeDataService);
 
   public instrumentsList$!: Observable<Instrument[]>;
-
-  realtimeMessages: any[] = [];
+  public chartData$!: Observable<CandlestickChart[]>;
+  public liveData$!: Observable<LiveData | undefined>;
 
   ngOnInit(): void {
-    this.instrumentsList$ = this.getInsruments()
-      .pipe(
-        map((res: InstrumentReponce) => {
-          return res.data
-        })
-      );
-      
-    // this.getInsruments()
+    this.getInsruments();
+    this.websocketConnect();
   }
 
-  public onInstumentSelect(id: string) {
-    const testSTR = 'ebefe2c7-5ac9-43bb-a8b7-4a97bf2c2576'
-    this.instruments.getItemBar(id).subscribe(
-      s => console.log(s)
-    )
+  public onInstumentSelect(id: string): void {
+    // const testSTR = 'ebefe2c7-5ac9-43bb-a8b7-4a97bf2c2576'
+    this.chartData$ = this.instrumentsService.getItemBarData(id);
+    this.realtimeDataService.sendMessage(id);
   }
 
-  public getInsruments() {
-    return this.instruments.getInstruments()
-    // .subscribe(
-    //   s => console.log(s)
-    // )
+  private getInsruments(): void {
+    this.instrumentsList$ =
+      this.instrumentsService.getInstruments()
+        .pipe(
+          map((res: InstrumentReponce) => {
+            return res.data
+          })
+        );
   }
 
-  getItemBar() {
-    this.instruments.getItemBar(
-      'ebefe2c7-5ac9-43bb-a8b7-4a97bf2c2576',
-    ).subscribe(
-      s => console.log(s)
-    )
-  }
-
-  websocket() {
-    this.realtimeDataService.connect().subscribe({
-      next: (message) => {
-        console.log('Received realtime message in component:', message);
-        this.realtimeMessages.push(message);
-      },
-      error: (err) => {
-        console.error('Realtime data error in component:', err);
-      },
-      complete: () => {
-        console.log('Realtime data stream completed.');
-      }
-    });
-  }
-
-  sendMessage() {
-    const message = {
-      "type": "l1-subscription",
-      "id": "1",
-      "instrumentId": "ebefe2c7-5ac9-43bb-a8b7-4a97bf2c2576",
-      "provider": "simulation",
-      "subscribe": true,
-      "kinds": [
-        "ask",
-        "bid",
-        "last"
-      ]
-    }
-    this.realtimeDataService.sendMessage(message);
+  private websocketConnect() {
+    this.liveData$ =
+      this.realtimeDataService.connect()
+        .pipe(
+          map((message: LiveDataRes) => {
+            if (message.ask) {
+              return message.ask
+            }
+            else if (message.bid) {
+              return message.bid;
+            }
+            else {
+              return message.last;
+            }
+          })
+        )
   }
 }

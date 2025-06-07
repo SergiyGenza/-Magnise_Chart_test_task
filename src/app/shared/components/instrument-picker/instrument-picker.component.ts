@@ -16,7 +16,7 @@ export class InstrumentPickerComponent {
   instrumentList!: Instrument[];
   @Output() instumentSelectedId = new EventEmitter<string>();
 
-  searchValue: string = '';
+  public searchValue: string = '';
 
   public onInstumentSelect(id: string): void {
     this.instumentSelectedId.emit(id);

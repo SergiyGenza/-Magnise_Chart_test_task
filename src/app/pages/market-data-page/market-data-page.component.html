@@ -1,8 +1,3 @@
-<!-- <button (click)="getInsrument()">getInsrument</button> -->
-<button (click)="getItemBar()">getItemBar</button>
-<button (click)="websocket()">websocket</button>
-<button (click)="sendMessage()">sendMessage</button>
-
 @if (instrumentsList$ | async; as instrumentList){
 <instrument-picker 
   [instrumentList]="instrumentList"
@@ -10,4 +5,11 @@
 </instrument-picker>
 }
 
+@if (liveData$ | async; as liveData){
+  <!-- add symbol -->
+<live-data [symbol]="'symbol'" [liveData]="liveData"></live-data>
+}
 
+@if (chartData$ | async; as chartData){
+<historical-chart [chartData]="chartData"></historical-chart>
+}

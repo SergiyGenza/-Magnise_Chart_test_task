@@ -77,7 +77,19 @@ export class RealTimeDataService {
     return this.messagesSubject.asObservable();
   }
 
-  public sendMessage(message: any): void {
+  public sendMessage(id: string): void {
+    const message = {
+      "type": "l1-subscription",
+      "id": "1",
+      "instrumentId": id,
+      "provider": "simulation",
+      "subscribe": true,
+      "kinds": [
+        "ask",
+        "bid",
+        "last"
+      ]
+    }
     if (this.socketSubject && !this.socketSubject.closed) {
       this.socketSubject.next(message);
     } else {
