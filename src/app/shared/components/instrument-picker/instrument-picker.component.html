@@ -1,0 +1,11 @@
+<input type="search" [(ngModel)]="searchValue" required>
+<label for="site-search">Subscibe</label>
+@if (searchValue){
+<div class="list">
+  @for (i of instrumentList | instruments:searchValue; track $index ) {
+    <div class="" (click)="onInstumentSelect(i.id)">
+      <div>{{i.currency}}</div>
+      <div>{{i.symbol}}</div>
+    </div>
+  }
+</div>}
