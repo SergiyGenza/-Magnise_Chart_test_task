@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { LiveDataComponent } from './live-data.component';
+import { StreamingDataComponent } from './streaming-data.component';
 
-describe('LiveDataComponent', () => {
-  let component: LiveDataComponent;
-  let fixture: ComponentFixture<LiveDataComponent>;
+describe('StreamingDataComponent', () => {
+  let component: StreamingDataComponent;
+  let fixture: ComponentFixture<StreamingDataComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LiveDataComponent]
+      imports: [StreamingDataComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(LiveDataComponent);
+    fixture = TestBed.createComponent(StreamingDataComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

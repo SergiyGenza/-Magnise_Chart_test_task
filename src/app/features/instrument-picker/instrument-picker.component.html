@@ -1,7 +1,6 @@
 <input type="search"  id="instrumentSearchInput" [(ngModel)]="searchValue" required>
 <button (click)="onSubsribeBtnToogle()">{{btnTitle}}</button>
 
-<!-- @if (showList$ | async){ -->
 <div class="list" [toggleOnFocus]="'#instrumentSearchInput'" >
 @for (i of instrumentList | instruments:searchValue; track $index ) {
   <instrument-item 
@@ -12,4 +11,3 @@
   <span> No instrument found!</span>
   }
 </div>
-<!-- }  -->

@@ -1,10 +1,9 @@
-import { ChangeDetectionStrategy, Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, Output, EventEmitter } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Instrument } from '../../common/models/instrument';
 import { InstrumentsPipe } from '../../common/pipe/instruments.pipe';
 import { InstrumentItemComponent } from '../../shared/components/instrument-item/instrument-item.component';
-import { AsyncPipe } from '@angular/common';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { ToggleOnFocusDirective } from '../../shared/directive/toggle-on-focus.directive';
 
 enum sub {
@@ -20,7 +19,7 @@ enum sub {
   styleUrl: './instrument-picker.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class InstrumentPickerComponent implements OnInit {
+export class InstrumentPickerComponent {
   @Input({ required: true })
   public instrumentList!: Instrument[];
 
@@ -29,16 +28,10 @@ export class InstrumentPickerComponent implements OnInit {
   @Output()
   unsubcribe = new EventEmitter();
 
-  private lastPicedInstrument$ = new BehaviorSubject<Instrument | null>(null);
-
-  // public openList: boolean = true;
-
   public searchValue: string = '';
   public btnTitle = sub.Subscribe;
 
-  ngOnInit(): void {
-    // throw new Error('Method not implemented.');
-  }
+  private lastPicedInstrument$ = new BehaviorSubject<Instrument | null>(null);
 
   public onInstumentSelect(instrument: Instrument): void {
     this.lastPicedInstrument$.next(instrument);
@@ -59,5 +52,4 @@ export class InstrumentPickerComponent implements OnInit {
   private btnTitleChange(title: sub): void {
     this.btnTitle = title;
   }
-
 }

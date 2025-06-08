@@ -3,19 +3,27 @@ import { InstrumentsService } from '../../common/services/instruments.service';
 import { RealTimeDataService } from '../../common/services/real-time-data.service';
 import { InstrumentPickerComponent } from '../../features/instrument-picker/instrument-picker.component';
 import { map, Observable } from 'rxjs';
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, DatePipe } from '@angular/common';
 import { Instrument, InstrumentReponce } from '../../common/models/instrument';
-import { LiveDataComponent } from '../../shared/components/live-data/live-data.component';
 import { HistoricalChartComponent } from '../../shared/components/historical-chart/historical-chart.component';
 import { CandlestickChart } from '../../common/models/candlestick.chart';
 import { LiveData, LiveDataRes } from '../../common/models/live.data';
+import { LiveDataWrapperComponent } from '../../features/live-data-wrapper/live-data-wrapper.component';
+import { StreamingDataComponent } from '../../shared/components/streaming-data/streaming-data.component';
 
 @Component({
   selector: 'market-data-page',
   standalone: true,
-  imports: [InstrumentPickerComponent, LiveDataComponent, HistoricalChartComponent, AsyncPipe],
+
   templateUrl: './market-data-page.component.html',
-  styleUrl: './market-data-page.component.scss'
+  styleUrl: './market-data-page.component.scss',
+  imports: [
+    AsyncPipe,
+    DatePipe,
+    InstrumentPickerComponent,
+    HistoricalChartComponent,
+    LiveDataWrapperComponent,
+    StreamingDataComponent],
 })
 export class MarketDataPageComponent implements OnInit {
   private instrumentsService = inject(InstrumentsService);
@@ -32,8 +40,6 @@ export class MarketDataPageComponent implements OnInit {
   }
 
   public onInstumentSelect(instrument: Instrument): void {
-    // const testSTR = 'ebefe2c7-5ac9-43bb-a8b7-4a97bf2c2576'
-
     this.chartData$ = this.instrumentsService.getItemBarData(instrument.id);
     this.realtimeDataService.sendMessage(instrument.id);
     this.symbol = instrument.symbol;
@@ -68,5 +74,4 @@ export class MarketDataPageComponent implements OnInit {
         })
       )
   }
-
 }

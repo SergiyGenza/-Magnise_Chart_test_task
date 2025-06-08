@@ -18,6 +18,7 @@ export class LoginComponent implements OnDestroy {
   private sub$ = new Subject<void>();
 
   public auth(): void {
+    this.authService.removeToken();
     if (!this.authService.getAuthToken()) {
       this.authService.fetchToken()
         .pipe(

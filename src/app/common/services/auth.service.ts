@@ -64,6 +64,10 @@ export class AuthService {
     localStorage.setItem(this.TOKEN_KEY, token);
   }
 
+  public removeToken(): void {
+    localStorage.removeItem(this.TOKEN_KEY);
+  }
+
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'An unknown error occurred!';
     if (error.error instanceof ErrorEvent) {
