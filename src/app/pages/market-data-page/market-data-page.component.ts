@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { InstrumentsService } from '../../common/services/instruments.service';
 import { RealTimeDataService } from '../../common/services/real-time-data.service';
-import { InstrumentPickerComponent } from '../../shared/components/instrument-picker/instrument-picker.component';
+import { InstrumentPickerComponent } from '../../features/instrument-picker/instrument-picker.component';
 import { map, Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { Instrument, InstrumentReponce } from '../../common/models/instrument';
@@ -24,43 +24,49 @@ export class MarketDataPageComponent implements OnInit {
   public instrumentsList$!: Observable<Instrument[]>;
   public chartData$!: Observable<CandlestickChart[]>;
   public liveData$!: Observable<LiveData | undefined>;
+  public symbol!: string;
 
   ngOnInit(): void {
     this.getInsruments();
     this.websocketConnect();
   }
 
-  public onInstumentSelect(id: string): void {
+  public onInstumentSelect(instrument: Instrument): void {
     // const testSTR = 'ebefe2c7-5ac9-43bb-a8b7-4a97bf2c2576'
-    this.chartData$ = this.instrumentsService.getItemBarData(id);
-    this.realtimeDataService.sendMessage(id);
+
+    this.chartData$ = this.instrumentsService.getItemBarData(instrument.id);
+    this.realtimeDataService.sendMessage(instrument.id);
+    this.symbol = instrument.symbol;
+  }
+
+  public onUnsub() {
+    this.realtimeDataService.disconnect();
   }
 
   private getInsruments(): void {
-    this.instrumentsList$ =
-      this.instrumentsService.getInstruments()
-        .pipe(
-          map((res: InstrumentReponce) => {
-            return res.data
-          })
-        );
+    this.instrumentsList$ = this.instrumentsService.getInstruments()
+      .pipe(
+        map((res: InstrumentReponce) => {
+          return res.data
+        })
+      );
   }
 
   private websocketConnect() {
-    this.liveData$ =
-      this.realtimeDataService.connect()
-        .pipe(
-          map((message: LiveDataRes) => {
-            if (message.ask) {
-              return message.ask
-            }
-            else if (message.bid) {
-              return message.bid;
-            }
-            else {
-              return message.last;
-            }
-          })
-        )
+    this.liveData$ = this.realtimeDataService.connect()
+      .pipe(
+        map((message: LiveDataRes) => {
+          if (message.ask) {
+            return message.ask
+          }
+          else if (message.bid) {
+            return message.bid;
+          }
+          else {
+            return message.last;
+          }
+        })
+      )
   }
+
 }

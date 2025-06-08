@@ -1,13 +1,12 @@
 @if (instrumentsList$ | async; as instrumentList){
-<instrument-picker 
-  [instrumentList]="instrumentList"
-  (instumentSelectedId)="onInstumentSelect($event)">
+<instrument-picker [instrumentList]="instrumentList"
+                   (instumentSelectedId)="onInstumentSelect($event)"
+                   (unsubcribe)="onUnsub()">
 </instrument-picker>
 }
 
 @if (liveData$ | async; as liveData){
-  <!-- add symbol -->
-<live-data [symbol]="'symbol'" [liveData]="liveData"></live-data>
+<live-data [symbol]="symbol" [liveData]="liveData"></live-data>
 }
 
 @if (chartData$ | async; as chartData){
