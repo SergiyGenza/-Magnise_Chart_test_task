@@ -26,7 +26,7 @@ export class LoginComponent implements OnDestroy {
         ).subscribe({
           next: (response) => {
             console.log('Successfully obtained token:', response);
-            this.navigateToMarlet();
+            setTimeout(() => this.navigateToMarlet(), 1000);
           },
           error: (err) => {
             console.error('Token acquisition failed:', err);

@@ -5,11 +5,12 @@ import { InstrumentPickerComponent } from '../../features/instrument-picker/inst
 import { map, Observable } from 'rxjs';
 import { AsyncPipe, DatePipe } from '@angular/common';
 import { Instrument, InstrumentReponce } from '../../common/models/instrument';
-import { HistoricalChartComponent } from '../../shared/components/historical-chart/historical-chart.component';
-import { CandlestickChart } from '../../common/models/candlestick.chart';
 import { LiveData, LiveDataRes } from '../../common/models/live.data';
 import { LiveDataWrapperComponent } from '../../features/live-data-wrapper/live-data-wrapper.component';
 import { StreamingDataComponent } from '../../shared/components/streaming-data/streaming-data.component';
+import { ChartComponent } from '../../features/chart/chart.component';
+import { TESTDATA } from '../../common/test.data';
+import { CandleChartComponent } from '../../shared/components/candle-chart/candle-chart.component';
 
 @Component({
   selector: 'market-data-page',
@@ -21,18 +22,21 @@ import { StreamingDataComponent } from '../../shared/components/streaming-data/s
     AsyncPipe,
     DatePipe,
     InstrumentPickerComponent,
-    HistoricalChartComponent,
     LiveDataWrapperComponent,
-    StreamingDataComponent],
+    StreamingDataComponent,
+    ChartComponent,
+    CandleChartComponent],
 })
 export class MarketDataPageComponent implements OnInit {
   private instrumentsService = inject(InstrumentsService);
   private realtimeDataService = inject(RealTimeDataService);
 
   public instrumentsList$!: Observable<Instrument[]>;
-  public chartData$!: Observable<CandlestickChart[]>;
+  public chartData$!: Observable<any>;
   public liveData$!: Observable<LiveData | undefined>;
   public symbol!: string;
+
+  public testData = TESTDATA;
 
   ngOnInit(): void {
     this.getInsruments();
@@ -40,12 +44,15 @@ export class MarketDataPageComponent implements OnInit {
   }
 
   public onInstumentSelect(instrument: Instrument): void {
-    this.chartData$ = this.instrumentsService.getItemBarData(instrument.id);
+    this.chartData$ = this.instrumentsService.getItemBarData(instrument.id)
+      .pipe(
+        map(res => res.data)
+      )
     this.realtimeDataService.sendMessage(instrument.id);
     this.symbol = instrument.symbol;
   }
 
-  public onUnsub() {
+  public onUnsub(): void {
     this.realtimeDataService.disconnect();
   }
 
@@ -58,7 +65,7 @@ export class MarketDataPageComponent implements OnInit {
       );
   }
 
-  private websocketConnect() {
+  private websocketConnect(): void {
     this.liveData$ = this.realtimeDataService.connect()
       .pipe(
         map((message: LiveDataRes) => {
