@@ -1,3 +1,7 @@
 <button (click)="auth()">
   login
 </button>
+@if (errorMessage()){
+<div class="error message">
+  {{errorMessage()}}
+</div>}
