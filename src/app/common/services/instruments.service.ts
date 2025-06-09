@@ -46,7 +46,7 @@ export class InstrumentsService {
     );
   }
 
-  public getItemBarData(instrumentId: string, provider: string = 'oanda', interval: number = 1, periodicity: string = 'minute', barsCount: number = 10): Observable<any> {
+  public getItemBarData(instrumentId: string, provider: string = 'simulation', interval: number = 1, periodicity: string = 'minute', barsCount: number = 10): Observable<any> {
     let params = new HttpParams();
     params = params.append('instrumentId', instrumentId);
     params = params.append('provider', provider);

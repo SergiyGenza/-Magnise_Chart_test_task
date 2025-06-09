@@ -4,9 +4,7 @@ import {
   ApexAxisChartSeries,
   ApexChart,
   ApexXAxis,
-  ApexYAxis,
-  ApexTitleSubtitle,
-  ApexTooltip
+  ApexYAxis
 } from 'ng-apexcharts';
 import { OhlcvOutputItem, transformOhlcvDataReverse } from '../../../common/utils/transform.data';
 
@@ -15,8 +13,6 @@ export type ChartOptions = {
   chart: ApexChart;
   xaxis: ApexXAxis;
   yaxis: ApexYAxis;
-  title: ApexTitleSubtitle;
-  tooltip: ApexTooltip;
 };
 
 @Component({
@@ -68,14 +64,6 @@ export class CandleChartComponent {
           enabled: true
         }
       },
-      title: {
-        text: 'EUR/USD Candlestick Chart',
-        align: 'left'
-      },
-      tooltip: {
-        enabled: true,
-        shared: true
-      }
     };
   }
 

@@ -8,14 +8,12 @@ import { Instrument, InstrumentReponce } from '../../common/models/instrument';
 import { LiveData, LiveDataRes } from '../../common/models/live.data';
 import { LiveDataWrapperComponent } from '../../features/live-data-wrapper/live-data-wrapper.component';
 import { StreamingDataComponent } from '../../shared/components/streaming-data/streaming-data.component';
-import { ChartComponent } from '../../features/chart/chart.component';
 import { TESTDATA } from '../../common/test.data';
 import { CandleChartComponent } from '../../shared/components/candle-chart/candle-chart.component';
 
 @Component({
   selector: 'market-data-page',
   standalone: true,
-
   templateUrl: './market-data-page.component.html',
   styleUrl: './market-data-page.component.scss',
   imports: [
@@ -24,8 +22,8 @@ import { CandleChartComponent } from '../../shared/components/candle-chart/candl
     InstrumentPickerComponent,
     LiveDataWrapperComponent,
     StreamingDataComponent,
-    ChartComponent,
-    CandleChartComponent],
+    CandleChartComponent
+  ],
 })
 export class MarketDataPageComponent implements OnInit {
   private instrumentsService = inject(InstrumentsService);
