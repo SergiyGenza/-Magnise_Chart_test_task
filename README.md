@@ -1,3 +1,30 @@
+# About Task
+
+This is a test assignment implemented using Angular 18. All components are standalone. Reactivity within components is ensured by leveraging RxJS. In some instances, signals are used, for example, in the AuthService.
+
+The application's structure is as follows: A user goes through a simple Login component. They then proceed to the Main Page. In the input component, the user selects an instrument to observe and clicks the "Subscribe" button.
+
+Upon initialization, the MarketDataPageComponent retrieves a list of available instruments and connects to a WebSocket using the provided token.
+
+Subsequently, the user receives real-time data from the WebSocket on the first card and sees a chart with historical data on another card. When the "Unsubscribe" button is clicked, data streaming ceases.
+
+The application is implemented with the help of three services: `RealTimeDataService`, `InstrumentsService`, and `AuthService`.
+
+A simple `AuthGuard` is utilized for conditional user access to the main data.
+
+Components are organized into three groups: pages, features, and shared components.
+
+A custom directive is used to display and hide the list of instruments.
+
+
+Additionally, a simple backend is implemented to handle requests. To set it up and run:
+1. Install dependencies: `npm i`
+2. Start the development server: `npm run dev`
+
+The frontend part is launched similarly:
+1. Install dependencies: `npm i`
+2. Start the Angular development server: `ng serve`
+
 # MagniseFintacharts
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.2.
@@ -25,3 +52,4 @@ Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To u
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
