@@ -1,8 +1,53 @@
 :host {
   display: flex;
+  justify-content: center;
+  min-height: 98dvh;
+  background-color: var(--bg-page);
+  padding: 30px;
+  box-sizing: border-box;
+}
+
+.data-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  width: 100%;
+  max-width: 600px;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.data-dashboard>* {
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+  padding: 25px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+live-data-wrapper {
+  display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  gap: 15px;
+}
 
-  height: 50dvh;;
+streaming-data {
+  font-size: 1.8em;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+streaming-data:last-child {
+  font-size: 0.9em;
+  color: var(--text-medium);
+  font-weight: 400;
+}
+
+app-candle-chart {
+  min-height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

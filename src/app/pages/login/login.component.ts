@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy } from '@angular/core';
+import { Component, inject, OnDestroy, signal } from '@angular/core';
 import { AuthService } from '../../common/services/auth.service';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
@@ -16,8 +16,11 @@ export class LoginComponent implements OnDestroy {
   private router = inject(Router);
 
   private sub$ = new Subject<void>();
+  public errorMessage = signal<string | null>(null);
 
   public auth(): void {
+    this.errorMessage.set(null);
+    
     this.authService.removeToken();
     if (!this.authService.getAuthToken()) {
       this.authService.fetchToken()
@@ -29,7 +32,7 @@ export class LoginComponent implements OnDestroy {
             setTimeout(() => this.navigateToMarlet(), 1000);
           },
           error: (err) => {
-            console.error('Token acquisition failed:', err);
+            this.errorMessage.set(err.message || 'An unknown error occurred during login.');
           }
         });
 

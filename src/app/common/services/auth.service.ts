@@ -1,9 +1,13 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { BehaviorSubject, throwError } from 'rxjs';
+import { throwError } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { environments } from '../../../environments/environments';
 
+interface AuthResponse {
+  access_token?: string;
+  token?: string;
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -11,8 +15,9 @@ export class AuthService {
   private readonly tokenUrl = environments.API_KEY!;
   private readonly TOKEN_KEY = 'authToken';
 
-  public readonly _isAuthenticated = new BehaviorSubject<boolean>(false);
-  public isAuthenticated$ = this._isAuthenticated.asObservable();
+  private readonly _isAuthenticatedSignal = signal<boolean>(false);
+
+  public readonly isAuthenticated = this._isAuthenticatedSignal.asReadonly();
 
   private http = inject(HttpClient);
 
@@ -22,12 +27,14 @@ export class AuthService {
 
   public checkTokenOnAppInit(): void {
     if (this.getAuthToken()) {
-      this._isAuthenticated.next(true);
+      this._isAuthenticatedSignal.set(true);
       console.log('all is good');
-
     } else {
-      this.fetchToken()
-      console.log('refetch Token');
+      this.fetchToken().subscribe({
+        next: () => console.log('refetch Token successful'),
+        error: (err) => console.error('refetch Token failed:', err)
+      });
+      console.log('refetch Token initiated');
     }
   }
 
@@ -37,35 +44,36 @@ export class AuthService {
       password: environments.PASSWORD,
     };
 
-    return this.http.post<any>(this.tokenUrl, payload).pipe(
-      tap((response: any) => {
+    return this.http.post<AuthResponse>(this.tokenUrl, payload).pipe(
+      tap((response: AuthResponse) => {
         if (response && response.access_token) {
           this.saveAuthToken(response.access_token);
           console.log('get Token');
         } else if (response && response.token) {
           this.saveAuthToken(response.token);
           console.log('get Token');
-
         } else {
           console.warn('Token not found in response:', response);
           throw new Error('Authentication token not found in response.');
         }
-        this._isAuthenticated.next(true);
+        this._isAuthenticatedSignal.set(true);
       }),
       catchError(this.handleError)
     );
   }
 
   public getAuthToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
+    return sessionStorage.getItem(this.TOKEN_KEY);
   }
 
   private saveAuthToken(token: string): void {
-    localStorage.setItem(this.TOKEN_KEY, token);
+    sessionStorage.setItem(this.TOKEN_KEY, token);
+    this._isAuthenticatedSignal.set(true);
   }
 
   public removeToken(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
+    sessionStorage.removeItem(this.TOKEN_KEY);
+    this._isAuthenticatedSignal.set(false);
   }
 
   private handleError(error: HttpErrorResponse) {
@@ -79,6 +87,7 @@ export class AuthService {
       }
     }
     console.error(errorMessage);
+    this._isAuthenticatedSignal.set(false);
     return throwError(() => new Error(errorMessage));
   }
 }

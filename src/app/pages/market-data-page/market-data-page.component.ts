@@ -2,13 +2,12 @@ import { Component, inject, OnInit } from '@angular/core';
 import { InstrumentsService } from '../../common/services/instruments.service';
 import { RealTimeDataService } from '../../common/services/real-time-data.service';
 import { InstrumentPickerComponent } from '../../features/instrument-picker/instrument-picker.component';
-import { map, Observable } from 'rxjs';
+import { BehaviorSubject, map, Observable } from 'rxjs';
 import { AsyncPipe, DatePipe } from '@angular/common';
 import { Instrument, InstrumentReponce } from '../../common/models/instrument';
-import { LiveData, LiveDataRes } from '../../common/models/live.data';
+import { LiveData } from '../../common/models/live.data';
 import { LiveDataWrapperComponent } from '../../features/live-data-wrapper/live-data-wrapper.component';
 import { StreamingDataComponent } from '../../shared/components/streaming-data/streaming-data.component';
-import { TESTDATA } from '../../common/test.data';
 import { CandleChartComponent } from '../../shared/components/candle-chart/candle-chart.component';
 
 @Component({
@@ -29,12 +28,11 @@ export class MarketDataPageComponent implements OnInit {
   private instrumentsService = inject(InstrumentsService);
   private realtimeDataService = inject(RealTimeDataService);
 
+  private lastSubInstrument = new BehaviorSubject<Instrument | null>(null);
   public instrumentsList$!: Observable<Instrument[]>;
   public chartData$!: Observable<any>;
   public liveData$!: Observable<LiveData | undefined>;
   public symbol!: string;
-
-  public testData = TESTDATA;
 
   ngOnInit(): void {
     this.getInsruments();
@@ -42,16 +40,23 @@ export class MarketDataPageComponent implements OnInit {
   }
 
   public onInstumentSelect(instrument: Instrument): void {
+    if (this.lastSubInstrument.value !== null) {
+      if (this.lastSubInstrument.value !== instrument) {
+        this.onUnsub(this.lastSubInstrument.value!);
+      }
+    }
     this.chartData$ = this.instrumentsService.getItemBarData(instrument.id)
       .pipe(
         map(res => res.data)
       )
     this.realtimeDataService.sendMessage(instrument.id);
     this.symbol = instrument.symbol;
+    this.lastSubInstrument.next(instrument);
+
   }
 
-  public onUnsub(): void {
-    this.realtimeDataService.disconnect();
+  public onUnsub(instrument: Instrument): void {
+    this.realtimeDataService.sendMessage(instrument.id, false);
   }
 
   private getInsruments(): void {
@@ -66,15 +71,15 @@ export class MarketDataPageComponent implements OnInit {
   private websocketConnect(): void {
     this.liveData$ = this.realtimeDataService.connect()
       .pipe(
-        map((message: LiveDataRes) => {
-          if (message.ask) {
-            return message.ask
+        map((message: any) => {
+          if (message['ask']) {
+            return message['ask']
           }
-          else if (message.bid) {
-            return message.bid;
+          else if (message['bid']) {
+            return message['bid'];
           }
           else {
-            return message.last;
+            return message['last'];
           }
         })
       )

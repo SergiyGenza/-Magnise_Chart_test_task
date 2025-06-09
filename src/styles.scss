@@ -1,1 +1,55 @@
 /* You can add global styles to this file, and also import other style files */
+:root {
+  --primary-color: #007bff;
+  --primary-dark-hover: #0056b3;
+  --primary-dark-active: #004085;
+
+  --text-dark: #333333;
+  --text-medium: #555555;
+  --text-light: #ffffff;
+
+  --bg-page: #f0f2f5;
+  --bg-card: #ffffff;
+
+  --error-text: #d9534f;
+  --error-bg: #fcebeb;
+  --error-border: #d9534f;
+}
+
+body {
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+button {
+  background-color: var(--primary-color);
+  color: var(--text-light);
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  outline: none;
+}
+
+button:hover {
+  background-color: var(--primary-dark-hover);
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: translateY(0);
+  background-color: var(--primary-dark-active);
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  margin: 0;
+  padding: 0;
+}

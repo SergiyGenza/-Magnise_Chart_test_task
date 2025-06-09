@@ -17,7 +17,6 @@ export class InstrumentItemComponent {
   selectedInstrument = new EventEmitter<Instrument>();
 
   public onInstrumentSelect(instrument: Instrument) {
-    console.log('works');
     this.selectedInstrument.emit(instrument);
   }
 } 

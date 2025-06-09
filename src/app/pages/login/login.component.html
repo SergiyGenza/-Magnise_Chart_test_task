@@ -1,3 +1,13 @@
-<button (click)="auth()">
-  login
-</button>
+<div class="login-card">
+  <h1>You are not authorized!</h1>
+  <p>Please login first! </p>
+  <button (click)="auth()">
+    Login
+  </button>
+
+  @if (errorMessage()) {
+  <div class="error-message">
+    {{ errorMessage() }}
+  </div>
+  }
+</div>
