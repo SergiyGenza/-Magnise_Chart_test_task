@@ -77,13 +77,15 @@ export class RealTimeDataService {
     return this.messagesSubject.asObservable();
   }
 
-  public sendMessage(id: string): void {
+  public sendMessage(id: string, sub: boolean = true): void {
+    console.log(sub);
+
     const message = {
       "type": "l1-subscription",
       "id": "1",
       "instrumentId": id,
       "provider": "simulation",
-      "subscribe": true,
+      "subscribe": sub,
       "kinds": [
         "ask",
         "bid",

@@ -27,9 +27,9 @@ export class InstrumentPickerComponent implements OnChanges {
   @Output()
   instumentSelectedId = new EventEmitter<Instrument>();
   @Output()
-  subscribe = new EventEmitter<void>();
+  subscribe = new EventEmitter<Instrument>();
   @Output()
-  unsubscribe = new EventEmitter<void>();
+  unsubscribe = new EventEmitter<Instrument>();
 
   public searchValue: string;
   public btnTitle: ButtonAction = ButtonAction.Subscribe;
@@ -56,11 +56,11 @@ export class InstrumentPickerComponent implements OnChanges {
 
   public toggleSubscription(): void {
     if (this.lastPickedInstrument$.value && this.btnTitle === ButtonAction.Unsubscribe) {
-      this.unsubscribe.emit();
+      this.unsubscribe.emit(this.lastPickedInstrument$.value);
       this.btnTitle = ButtonAction.Subscribe;
     }
     else if (this.lastPickedInstrument$.value && this.btnTitle === ButtonAction.Subscribe) {
-      this.subscribe.emit();
+      this.subscribe.emit(this.lastPickedInstrument$.value);
       this.instumentSelectedId.emit(this.lastPickedInstrument$.value);
       this.btnTitle = ButtonAction.Unsubscribe;
     }

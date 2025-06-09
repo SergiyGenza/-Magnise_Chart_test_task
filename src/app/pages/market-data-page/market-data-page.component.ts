@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { InstrumentsService } from '../../common/services/instruments.service';
 import { RealTimeDataService } from '../../common/services/real-time-data.service';
 import { InstrumentPickerComponent } from '../../features/instrument-picker/instrument-picker.component';
-import { filter, map, Observable, Subject, take, takeUntil } from 'rxjs';
+import { BehaviorSubject, map, Observable, Subject } from 'rxjs';
 import { AsyncPipe, DatePipe } from '@angular/common';
 import { Instrument, InstrumentReponce } from '../../common/models/instrument';
 import { LiveData, LiveDataRes } from '../../common/models/live.data';
@@ -28,6 +28,7 @@ export class MarketDataPageComponent implements OnInit {
   private instrumentsService = inject(InstrumentsService);
   private realtimeDataService = inject(RealTimeDataService);
 
+  private lastSubInstrument = new BehaviorSubject<Instrument | null>(null);
   private destroy$ = new Subject<void>();
   public instrumentsList$!: Observable<Instrument[]>;
   public chartData$!: Observable<any>;
@@ -40,23 +41,26 @@ export class MarketDataPageComponent implements OnInit {
   }
 
   public onInstumentSelect(instrument: Instrument): void {
+    if (this.lastSubInstrument.value !== null) {
+      if (this.lastSubInstrument.value !== instrument) {
+        this.onUnsub(this.lastSubInstrument.value!);
+        console.log('wokrs');
+
+      }
+    }
     this.chartData$ = this.instrumentsService.getItemBarData(instrument.id)
       .pipe(
         map(res => res.data)
       )
     this.realtimeDataService.sendMessage(instrument.id);
     this.symbol = instrument.symbol;
+    this.lastSubInstrument.next(instrument);
 
   }
 
-  public onUnsub(): void {
-    this.realtimeDataService.disconnect();
+  public onUnsub(instrument: Instrument): void {
+    this.realtimeDataService.sendMessage(instrument.id, false);
   }
-
-  public onSubscribe(): void {
-
-  }
-
 
   private getInsruments(): void {
     this.instrumentsList$ = this.instrumentsService.getInstruments()
