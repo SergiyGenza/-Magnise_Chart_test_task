@@ -1,55 +1,68 @@
-import { ChangeDetectionStrategy, Component, Input, Output, EventEmitter } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Instrument } from '../../common/models/instrument';
 import { InstrumentsPipe } from '../../common/pipe/instruments.pipe';
 import { InstrumentItemComponent } from '../../shared/components/instrument-item/instrument-item.component';
 import { BehaviorSubject } from 'rxjs';
 import { ToggleOnFocusDirective } from '../../shared/directive/toggle-on-focus.directive';
+import { CommonModule } from '@angular/common';
 
-enum sub {
+enum ButtonAction {
   Subscribe = "Subscribe",
-  Unsubcribe = "Unsubcribe"
+  Unsubscribe = "Unsubscribe"
 }
 
 @Component({
   selector: 'instrument-picker',
   standalone: true,
-  imports: [FormsModule, InstrumentsPipe, InstrumentItemComponent, ToggleOnFocusDirective],
+  imports: [FormsModule, InstrumentsPipe, InstrumentItemComponent, ToggleOnFocusDirective, CommonModule],
   templateUrl: './instrument-picker.component.html',
   styleUrl: './instrument-picker.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class InstrumentPickerComponent {
+export class InstrumentPickerComponent implements OnChanges {
   @Input({ required: true })
   public instrumentList!: Instrument[];
 
   @Output()
   instumentSelectedId = new EventEmitter<Instrument>();
   @Output()
-  unsubcribe = new EventEmitter();
+  subscribe = new EventEmitter<void>();
+  @Output()
+  unsubscribe = new EventEmitter<void>();
 
-  public searchValue: string = '';
-  public btnTitle = sub.Subscribe;
+  public searchValue: string;
+  public btnTitle: ButtonAction = ButtonAction.Subscribe;
 
-  private lastPicedInstrument$ = new BehaviorSubject<Instrument | null>(null);
+  private lastPickedInstrument$ = new BehaviorSubject<Instrument | null>(null);
 
-  public onInstumentSelect(instrument: Instrument): void {
-    this.lastPicedInstrument$.next(instrument);
-    this.instumentSelectedId.emit(instrument);
-    this.btnTitleChange(sub.Unsubcribe);
+  constructor() {
+    this.searchValue = this.lastPickedInstrument$.value?.description || '';
   }
 
-  public onSubsribeBtnToogle(): void {
-    this.btnTitleChange(sub.Subscribe);
-
-    if (this.btnTitle === sub.Subscribe) this.unsubcribe.emit();
-
-    if (this.lastPicedInstrument$.value) {
-      this.onInstumentSelect(this.lastPicedInstrument$.value)
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['instrumentList'] && this.instrumentList.length === 0) {
+      this.lastPickedInstrument$.next(null);
+      this.searchValue = '';
     }
   }
 
-  private btnTitleChange(title: sub): void {
-    this.btnTitle = title;
+  public onInstrumentSelect(instrument: Instrument): void {
+    console.log(instrument.symbol);
+    this.btnTitle = ButtonAction.Subscribe;
+    this.lastPickedInstrument$.next(instrument);
+    this.searchValue = this.lastPickedInstrument$.value!.symbol;
+  }
+
+  public toggleSubscription(): void {
+    if (this.lastPickedInstrument$.value && this.btnTitle === ButtonAction.Unsubscribe) {
+      this.unsubscribe.emit();
+      this.btnTitle = ButtonAction.Subscribe;
+    }
+    else if (this.lastPickedInstrument$.value && this.btnTitle === ButtonAction.Subscribe) {
+      this.subscribe.emit();
+      this.instumentSelectedId.emit(this.lastPickedInstrument$.value);
+      this.btnTitle = ButtonAction.Unsubscribe;
+    }
   }
 }

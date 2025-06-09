@@ -9,12 +9,12 @@ export class InstrumentsPipe implements PipeTransform {
 
   transform(inst: Instrument[], searchValue: string): Instrument[] {
     if (searchValue) {
+      const lowerCaseSearchValue = searchValue.toLocaleLowerCase();
       return inst.filter(item => {
-        return item.description.toLowerCase().includes(searchValue);
+        return item.symbol.toLocaleLowerCase().includes(lowerCaseSearchValue);
       });
     }
 
     return inst;
   }
-
 }

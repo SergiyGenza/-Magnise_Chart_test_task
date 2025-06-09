@@ -3,7 +3,8 @@
   <instrument-picker 
     [instrumentList]="instrumentList" 
     (instumentSelectedId)="onInstumentSelect($event)"
-    (unsubcribe)="onUnsub()">
+    (subscribe)="onSubscribe()"
+    (unsubscribe)="onUnsub()">
   </instrument-picker>
   }
 
