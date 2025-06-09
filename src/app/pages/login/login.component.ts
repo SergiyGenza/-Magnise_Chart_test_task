@@ -18,6 +18,7 @@ export class LoginComponent implements OnDestroy {
   private sub$ = new Subject<void>();
 
   public auth(): void {
+    this.authService.removeToken();
     if (!this.authService.getAuthToken()) {
       this.authService.fetchToken()
         .pipe(
@@ -25,7 +26,7 @@ export class LoginComponent implements OnDestroy {
         ).subscribe({
           next: (response) => {
             console.log('Successfully obtained token:', response);
-            this.navigateToMarlet();
+            setTimeout(() => this.navigateToMarlet(), 1000);
           },
           error: (err) => {
             console.error('Token acquisition failed:', err);

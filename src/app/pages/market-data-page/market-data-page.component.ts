@@ -1,66 +1,82 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { InstrumentsService } from '../../common/services/instruments.service';
 import { RealTimeDataService } from '../../common/services/real-time-data.service';
-import { InstrumentPickerComponent } from '../../shared/components/instrument-picker/instrument-picker.component';
+import { InstrumentPickerComponent } from '../../features/instrument-picker/instrument-picker.component';
 import { map, Observable } from 'rxjs';
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, DatePipe } from '@angular/common';
 import { Instrument, InstrumentReponce } from '../../common/models/instrument';
-import { LiveDataComponent } from '../../shared/components/live-data/live-data.component';
-import { HistoricalChartComponent } from '../../shared/components/historical-chart/historical-chart.component';
-import { CandlestickChart } from '../../common/models/candlestick.chart';
 import { LiveData, LiveDataRes } from '../../common/models/live.data';
+import { LiveDataWrapperComponent } from '../../features/live-data-wrapper/live-data-wrapper.component';
+import { StreamingDataComponent } from '../../shared/components/streaming-data/streaming-data.component';
+import { TESTDATA } from '../../common/test.data';
+import { CandleChartComponent } from '../../shared/components/candle-chart/candle-chart.component';
 
 @Component({
   selector: 'market-data-page',
   standalone: true,
-  imports: [InstrumentPickerComponent, LiveDataComponent, HistoricalChartComponent, AsyncPipe],
   templateUrl: './market-data-page.component.html',
-  styleUrl: './market-data-page.component.scss'
+  styleUrl: './market-data-page.component.scss',
+  imports: [
+    AsyncPipe,
+    DatePipe,
+    InstrumentPickerComponent,
+    LiveDataWrapperComponent,
+    StreamingDataComponent,
+    CandleChartComponent
+  ],
 })
 export class MarketDataPageComponent implements OnInit {
   private instrumentsService = inject(InstrumentsService);
   private realtimeDataService = inject(RealTimeDataService);
 
   public instrumentsList$!: Observable<Instrument[]>;
-  public chartData$!: Observable<CandlestickChart[]>;
+  public chartData$!: Observable<any>;
   public liveData$!: Observable<LiveData | undefined>;
+  public symbol!: string;
+
+  public testData = TESTDATA;
 
   ngOnInit(): void {
     this.getInsruments();
     this.websocketConnect();
   }
 
-  public onInstumentSelect(id: string): void {
-    // const testSTR = 'ebefe2c7-5ac9-43bb-a8b7-4a97bf2c2576'
-    this.chartData$ = this.instrumentsService.getItemBarData(id);
-    this.realtimeDataService.sendMessage(id);
+  public onInstumentSelect(instrument: Instrument): void {
+    this.chartData$ = this.instrumentsService.getItemBarData(instrument.id)
+      .pipe(
+        map(res => res.data)
+      )
+    this.realtimeDataService.sendMessage(instrument.id);
+    this.symbol = instrument.symbol;
+  }
+
+  public onUnsub(): void {
+    this.realtimeDataService.disconnect();
   }
 
   private getInsruments(): void {
-    this.instrumentsList$ =
-      this.instrumentsService.getInstruments()
-        .pipe(
-          map((res: InstrumentReponce) => {
-            return res.data
-          })
-        );
+    this.instrumentsList$ = this.instrumentsService.getInstruments()
+      .pipe(
+        map((res: InstrumentReponce) => {
+          return res.data
+        })
+      );
   }
 
-  private websocketConnect() {
-    this.liveData$ =
-      this.realtimeDataService.connect()
-        .pipe(
-          map((message: LiveDataRes) => {
-            if (message.ask) {
-              return message.ask
-            }
-            else if (message.bid) {
-              return message.bid;
-            }
-            else {
-              return message.last;
-            }
-          })
-        )
+  private websocketConnect(): void {
+    this.liveData$ = this.realtimeDataService.connect()
+      .pipe(
+        map((message: LiveDataRes) => {
+          if (message.ask) {
+            return message.ask
+          }
+          else if (message.bid) {
+            return message.bid;
+          }
+          else {
+            return message.last;
+          }
+        })
+      )
   }
 }

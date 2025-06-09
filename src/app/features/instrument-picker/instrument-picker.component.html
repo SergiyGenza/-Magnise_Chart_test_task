@@ -1,0 +1,13 @@
+<input type="search"  id="instrumentSearchInput" [(ngModel)]="searchValue" required>
+<button (click)="onSubsribeBtnToogle()">{{btnTitle}}</button>
+
+<div class="list" [toggleOnFocus]="'#instrumentSearchInput'" >
+@for (i of instrumentList | instruments:searchValue; track $index ) {
+  <instrument-item 
+    [instrumentItem]="i"
+    (selectedInstrument)="onInstumentSelect($event)">
+  </instrument-item>
+  } @empty {
+  <span> No instrument found!</span>
+  }
+</div>

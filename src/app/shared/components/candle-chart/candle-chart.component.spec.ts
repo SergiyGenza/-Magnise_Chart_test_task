@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { LiveDataComponent } from './live-data.component';
+import { CandleChartComponent } from './candle-chart.component';
 
-describe('LiveDataComponent', () => {
-  let component: LiveDataComponent;
-  let fixture: ComponentFixture<LiveDataComponent>;
+describe('CandleChartComponent', () => {
+  let component: CandleChartComponent;
+  let fixture: ComponentFixture<CandleChartComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LiveDataComponent]
+      imports: [CandleChartComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(LiveDataComponent);
+    fixture = TestBed.createComponent(CandleChartComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
