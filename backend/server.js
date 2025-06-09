@@ -219,8 +219,12 @@ wss.on("connection", (angularWs, req) => {
 
     if (!isAuthenticated) {
       try {
-        const parsedOnce = JSON.parse(msgStr);
-        const authMessage = JSON.parse(parsedOnce);
+        // const parsedOnce = JSON.parse(msgStr);
+        // console.log(parsedOnce);
+        // const authMessage = JSON.parse(parsedOnce);
+        // console.log(authMessage);
+
+        const authMessage = JSON.parse(msgStr);
 
         if (authMessage.type === "authenticate" && authMessage.token) {
           const authToken = authMessage.token;

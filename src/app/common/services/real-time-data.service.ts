@@ -4,33 +4,68 @@ import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import { AuthService } from './auth.service';
 import { environments } from '../../../environments/environments';
 
+export interface WebSocketMessage {
+  type: string;
+  [key: string]: unknown;
+}
+
+export interface AuthenticateMessage extends WebSocketMessage {
+  type: 'authenticate';
+  token: string;
+}
+
+export interface L1SubscriptionMessage extends WebSocketMessage {
+  type: 'l1-subscription';
+  id: string;
+  instrumentId: string;
+  provider: string;
+  subscribe: boolean;
+  kinds: ('ask' | 'bid' | 'last')[];
+}
+
+export interface L1PriceData {
+  timestamp: string;
+  price: number;
+  volume: number;
+}
+
+export interface L1UpdateMessage extends WebSocketMessage {
+  type: 'l1-update';
+  instrumentId: string;
+  provider: string;
+  ask?: L1PriceData;
+  bid?: L1PriceData;
+  last?: L1PriceData;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class RealTimeDataService {
 
   private authService = inject(AuthService);
-  private socketSubject!: WebSocketSubject<any>;
-  private messagesSubject = new Subject<any>();
-  public messages$: Observable<any> = this.messagesSubject.asObservable();
+  private socketSubject!: WebSocketSubject<WebSocketMessage>;
+  private messagesSubject = new Subject<WebSocketMessage>();
+  public messages$: Observable<WebSocketMessage> = this.messagesSubject.asObservable();
 
   private readonly WS_URL = environments.WS_URL!;
 
   public _isConnected = signal<boolean>(false);
   public readonly isConnected = this._isConnected.asReadonly();
 
-  public connect(): Observable<any> {
+  public connect(): Observable<WebSocketMessage> {
     const token = this.authService.getAuthToken();
     if (!token) {
       return throwError(() => new Error('No authentication token available.'));
     }
 
-    this.socketSubject = webSocket({
+    this.socketSubject = webSocket<WebSocketMessage>({
       url: this.WS_URL,
       openObserver: {
         next: () => {
           this._isConnected.set(true);
-          this.socketSubject.next(JSON.stringify({ type: 'authenticate', token: token }));
+          const authMessage: AuthenticateMessage = { type: 'authenticate', token: token };
+          this.socketSubject.next(authMessage);
         }
       },
       closeObserver: {
@@ -41,30 +76,32 @@ export class RealTimeDataService {
       },
       deserializer: (msg: MessageEvent) => {
         try {
-          return JSON.parse(msg.data);
+          return JSON.parse(msg.data) as WebSocketMessage;
         } catch (e) {
-          return msg.data;
+          console.error('WebSocket deserialization error:', e, 'Data:', msg.data);
+          return { type: 'unknown', originalData: msg.data };
         }
       },
-      serializer: (value: any) => {
+      serializer: (value: WebSocketMessage) => {
         try {
           return JSON.stringify(value);
         } catch (e) {
-          return value;
+          console.error('WebSocket serialization error:', e, 'Value:', value);
+          throw new Error('Failed to serialize WebSocket message.');
         }
       }
     });
 
     this.socketSubject.pipe(
-      catchError(error => {
+      catchError((error: unknown) => {
         this.messagesSubject.error(error);
         this._isConnected.set(false);
         return throwError(() => error);
       }),
     )
       .subscribe({
-        next: (msg: any) => this.messagesSubject.next(msg),
-        error: (err: any) => {
+        next: (msg: WebSocketMessage) => this.messagesSubject.next(msg),
+        error: (err: unknown) => {
           this.messagesSubject.error(err);
           this._isConnected.set(false);
         },
@@ -80,7 +117,7 @@ export class RealTimeDataService {
   public sendMessage(id: string, sub: boolean = true): void {
     console.log(sub);
 
-    const message = {
+    const message: L1SubscriptionMessage = {
       "type": "l1-subscription",
       "id": "1",
       "instrumentId": id,
@@ -91,7 +128,7 @@ export class RealTimeDataService {
         "bid",
         "last"
       ]
-    }
+    };
     if (this.socketSubject && !this.socketSubject.closed) {
       this.socketSubject.next(message);
     } else {

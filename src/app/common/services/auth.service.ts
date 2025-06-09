@@ -4,6 +4,10 @@ import { throwError } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { environments } from '../../../environments/environments';
 
+interface AuthResponse {
+  access_token?: string;
+  token?: string;
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -40,8 +44,8 @@ export class AuthService {
       password: environments.PASSWORD,
     };
 
-    return this.http.post<any>(this.tokenUrl, payload).pipe(
-      tap((response: any) => {
+    return this.http.post<AuthResponse>(this.tokenUrl, payload).pipe(
+      tap((response: AuthResponse) => {
         if (response && response.access_token) {
           this.saveAuthToken(response.access_token);
           console.log('get Token');

@@ -10,5 +10,5 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 })
 export class StreamingDataComponent {
   @Input({ required: true })
-  stream!: any;
+  stream!: unknown;
 }

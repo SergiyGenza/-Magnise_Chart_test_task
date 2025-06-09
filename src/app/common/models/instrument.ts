@@ -22,10 +22,9 @@ export interface Instrument {
   tickSize: number;
   currency: string;
   baseCurrency: string;
-  // mappings: InstrumentMappings;
-  // profile: InstrumentProfile;
-  mappings: any;
-  profile: any;
+  mappings: InstrumentMappings;
+  profile: InstrumentProfile;
+
 }
 
 export interface InstrumentMappings {

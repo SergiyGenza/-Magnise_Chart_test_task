@@ -1,4 +1,9 @@
+export interface OhlcvData {
+  data: OhlcvOutputItem[];
+}
+
 export interface OhlcvOutputItem {
+  data: any;
   t: string;
   o: number;
   h: number;

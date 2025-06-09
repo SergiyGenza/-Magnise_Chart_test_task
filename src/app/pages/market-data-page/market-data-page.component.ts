@@ -2,10 +2,10 @@ import { Component, inject, OnInit } from '@angular/core';
 import { InstrumentsService } from '../../common/services/instruments.service';
 import { RealTimeDataService } from '../../common/services/real-time-data.service';
 import { InstrumentPickerComponent } from '../../features/instrument-picker/instrument-picker.component';
-import { BehaviorSubject, map, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, map, Observable } from 'rxjs';
 import { AsyncPipe, DatePipe } from '@angular/common';
 import { Instrument, InstrumentReponce } from '../../common/models/instrument';
-import { LiveData, LiveDataRes } from '../../common/models/live.data';
+import { LiveData } from '../../common/models/live.data';
 import { LiveDataWrapperComponent } from '../../features/live-data-wrapper/live-data-wrapper.component';
 import { StreamingDataComponent } from '../../shared/components/streaming-data/streaming-data.component';
 import { CandleChartComponent } from '../../shared/components/candle-chart/candle-chart.component';
@@ -29,7 +29,6 @@ export class MarketDataPageComponent implements OnInit {
   private realtimeDataService = inject(RealTimeDataService);
 
   private lastSubInstrument = new BehaviorSubject<Instrument | null>(null);
-  private destroy$ = new Subject<void>();
   public instrumentsList$!: Observable<Instrument[]>;
   public chartData$!: Observable<any>;
   public liveData$!: Observable<LiveData | undefined>;
@@ -44,8 +43,6 @@ export class MarketDataPageComponent implements OnInit {
     if (this.lastSubInstrument.value !== null) {
       if (this.lastSubInstrument.value !== instrument) {
         this.onUnsub(this.lastSubInstrument.value!);
-        console.log('wokrs');
-
       }
     }
     this.chartData$ = this.instrumentsService.getItemBarData(instrument.id)
@@ -74,22 +71,17 @@ export class MarketDataPageComponent implements OnInit {
   private websocketConnect(): void {
     this.liveData$ = this.realtimeDataService.connect()
       .pipe(
-        map((message: LiveDataRes) => {
-          if (message.ask) {
-            return message.ask
+        map((message: any) => {
+          if (message['ask']) {
+            return message['ask']
           }
-          else if (message.bid) {
-            return message.bid;
+          else if (message['bid']) {
+            return message['bid'];
           }
           else {
-            return message.last;
+            return message['last'];
           }
         })
       )
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }
