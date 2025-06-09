@@ -1,14 +1,15 @@
-:host {
-  position: relative;
-}
+.instrument {
+  &__head {
+    display: flex;
+    justify-content: center;
+  }
 
-.list {
-  display: flex;
-  flex-direction: column;
-  position: absolute;
-  height: 20rem;
-  overflow: auto;
-  width: 100%;
-  z-index: 100;
-  background-color: white;
+  &__list {
+    display: flex;
+    flex-direction: column;
+    height: 20rem;
+    overflow: auto;
+    width: 100%;
+    background-color: white;
+  }
 }
